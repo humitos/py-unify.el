@@ -29,6 +29,8 @@
 
 ;;; Code:
 
+(require 'buftra)
+
 (defgroup py-unify nil
   "Use unify to beautify a Python buffer."
   :group 'convenience
@@ -45,8 +47,7 @@ Note that `--in-place' is used by default."
 (defcustom py-unify-enabled t
   "Wheter or not run \"unify\" command even if the hook is ran."
   :group 'py-unify
-  :type 'boolean
-)
+  :type 'boolean)
 
 (defun py-unify--call-executable (errbuf file)
   (zerop (apply 'call-process "unify" nil errbuf nil
@@ -57,19 +58,19 @@ Note that `--in-place' is used by default."
 (defun py-unify-buffer ()
   "Uses the \"unify\" tool to reformat the current buffer."
   (interactive)
-  (buftra--apply-executable-to-buffer "unify"
-                                      'py-unify--call-executable
-                                      nil
-                                      "py"
-                                      nil))
+  (if py-unify-enabled
+      (buftra--apply-executable-to-buffer "unify"
+                                          'py-unify--call-executable
+                                          nil
+                                          "py"
+                                          nil)))
 
 
 ;;;###autoload
 (defun py-unify-enable-on-save ()
   "Pre-save hook to be used before running unify."
   (interactive)
-  (if py-unify-enabled
-      (add-hook 'before-save-hook 'py-unify-buffer nil t)))
+  (add-hook 'before-save-hook 'py-unify-buffer nil t))
 
 (provide 'py-unify)
 
